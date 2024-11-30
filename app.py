@@ -1,8 +1,11 @@
 import streamlit as st
 from search_engine import SearchEngine
 from huffman import calculate_frequency, build_huffman_tree, generate_codes, compress, decompress
-from task_scheduler import Task, Resource, greedy_by_duration, greedy_by_priority
+from task_scheduler import Task, Resource, greedy_by_duration, greedy_by_priority, greedy_by_duration_and_priority
 import tempfile  # Pour créer un fichier temporaire
+import matplotlib.pyplot as plt
+
+
 
 # --- Interface Streamlit ---
 st.sidebar.title("Choisissez une fonction")
@@ -81,31 +84,50 @@ elif option == "Compression de Fichiers":
 
 elif option == "Planificateur de Tâches":
     st.title("Planificateur de Tâches avec Algorithmes Gloutons")
-    
+
     # Formulaire pour entrer les ressources
     resources_input = st.text_area("Entrez les ressources séparées par une virgule", "Ressource1, Ressource2, Ressource3")
     resources_names = resources_input.split(",")
     resources = [Resource(name.strip()) for name in resources_names]
 
     # Formulaire pour entrer les tâches
-    tasks_input = st.text_area("Entrez les tâches au format 'Nom, Durée, Priorité'", "Tâche 1, 3, 2\nTâche 2, 1, 1\nTâche 3, 4, 3")
+    tasks_input = st.text_area("Entrez les tâches au format 'Nom, Durée, Priorité, Durée maximale (optionnel)'", 
+                               "Tâche 1, 3, 2, 5\nTâche 2, 1, 1\nTâche 3, 4, 3, 6")
     tasks_lines = tasks_input.split("\n")
     tasks = []
-    
+
     for line in tasks_lines:
-        task_name, duration, priority = line.split(",")
-        tasks.append(Task(task_name.strip(), int(duration.strip()), int(priority.strip())))
-    
+        task_details = line.split(",")
+        task_name = task_details[0].strip()
+        duration = int(task_details[1].strip())
+        priority = int(task_details[2].strip())
+        max_duration = int(task_details[3].strip()) if len(task_details) > 3 else None
+        tasks.append(Task(task_name, duration, priority, max_duration))
+
     # Choix de l'algorithme
-    algorithm = st.selectbox("Choisissez l'algorithme de planification", ["Par Durée Minimale", "Par Priorité"])
+    algorithm = st.selectbox("Choisissez l'algorithme de planification", ["Par Durée Minimale", "Par Priorité", "Par Durée et Priorité"])
 
     if st.button("Planifier"):
         if algorithm == "Par Durée Minimale":
             schedule = greedy_by_duration(tasks, resources)
-        else:
+        elif algorithm == "Par Priorité":
             schedule = greedy_by_priority(tasks, resources)
+        else:
+            schedule = greedy_by_duration_and_priority(tasks, resources)
 
         # Affichage du planning
         st.write("Planning des tâches :")
         for task in schedule:
             st.write(f"{task.name} - Début: {task.start_time} - Fin: {task.end_time} - Assignée à: {task.assigned_to.name}")
+
+        # Visualiser le planning des ressources avec un graphique
+        fig, ax = plt.subplots()
+        for resource in resources:
+            ax.plot([task.start_time for task in schedule if task.assigned_to == resource],
+                    [task.end_time for task in schedule if task.assigned_to == resource], label=resource.name)
+
+        ax.set_xlabel("Temps")
+        ax.set_ylabel("Tâches")
+        ax.set_title("Planning des Ressources")
+        ax.legend()
+        st.pyplot(fig)
