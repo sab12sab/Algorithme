@@ -36,14 +36,19 @@ elif algorithm == "Compression et Décompression Huffman":
     uploaded_file = st.file_uploader("Téléchargez un fichier à compresser", type=["txt"])
     if uploaded_file:
         file_content = uploaded_file.getvalue().decode("utf-8")
-        compressed_data, tree = huffman_compress(file_content)
         
-        st.write("Données compressées :", compressed_data)
-        st.write("Arbre de Huffman :", tree)
-        
-        # Sauvegarder l'arbre et les données compressées dans les variables de session
-        st.session_state.compressed_data = compressed_data
-        st.session_state.tree = tree
+        if not file_content:
+            st.error("Le fichier est vide. Impossible de compresser.")
+        else:
+            # Compression du fichier
+            compressed_data, tree = huffman_compress(file_content)
+            
+            st.write("Données compressées :", compressed_data)
+            st.write("Arbre de Huffman :", tree)
+            
+            # Sauvegarder l'arbre et les données compressées dans les variables de session
+            st.session_state.compressed_data = compressed_data
+            st.session_state.tree = tree
 
     # Décompression
     if 'compressed_data' in st.session_state:
