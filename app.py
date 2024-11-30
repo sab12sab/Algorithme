@@ -1,68 +1,52 @@
 import streamlit as st
-from models import Task, Resource
-from scheduler import (
-    schedule_by_shortest_duration,
-    schedule_by_highest_priority,
-    schedule_with_dependencies,
-)
-from utils import generate_gantt_chart
+from graph_generator import generate_random_graph, graph_to_dict
+from dijkstra import dijkstra_fibonacci, dijkstra_binary_heap
+from huffman import huffman_compress, huffman_decompress
 
-# Initialisation des sessions
-if "tasks" not in st.session_state:
-    st.session_state.tasks = []
-if "resources" not in st.session_state:
-    st.session_state.resources = []
+# Titre de l'application Streamlit
+st.title("Application Dijkstra et Huffman")
 
-# Titre principal
-st.title("Planificateur de Tâches avec Algorithmes Gloutons")
+# Choix de l'algorithme via un menu déroulant
+algorithm = st.sidebar.selectbox("Choisissez un algorithme", ["Dijkstra avec Tas de Fibonacci", "Dijkstra avec Tas Binaire", "Compression et Décompression Huffman"])
 
-# Section pour ajouter des ressources
-st.header("Ajouter des ressources")
-resource_name = st.text_input("Nom de la ressource")
-resource_capacity = st.number_input("Capacité (nombre de tâches)", min_value=1, step=1)
-if st.button("Ajouter la ressource"):
-    st.session_state.resources.append(Resource(resource_name, resource_capacity))
-    st.success(f"Ressource {resource_name} ajoutée avec capacité {resource_capacity}.")
+# Implémentation du Dijkstra avec Tas de Fibonacci
+if algorithm == "Dijkstra avec Tas de Fibonacci":
+    st.header("Dijkstra avec Tas de Fibonacci")
+    
+    # Paramètres du graphe
+    num_nodes = st.slider("Nombre de nœuds", min_value=5, max_value=50, value=10)
+    density = st.slider("Densité du graphe", min_value=0.1, max_value=1.0, value=0.5)
+    
+    # Générer le graphe aléatoire
+    graph = generate_random_graph(num_nodes, density)
+    graph_dict = graph_to_dict(graph)
+    
+    start_node = st.selectbox("Choisissez le nœud de départ", options=list(graph_dict.keys()))
+    
+    # Calcul des plus courts chemins avec Dijkstra
+    distances, predecessors = dijkstra_fibonacci(graph_dict, start_node)  # Ou dijkstra_binary_heap
+    
+    st.write(f"Distances depuis le nœud {start_node} :", distances)
+    st.write("Prédécesseurs :", predecessors)
 
-# Section pour ajouter des tâches
-st.header("Ajouter des tâches")
-task_name = st.text_input("Nom de la tâche")
-task_duration = st.number_input("Durée (heures)", min_value=1, step=1)
-task_priority = st.slider("Priorité", min_value=1, max_value=10)
-task_dependencies = st.multiselect(
-    "Dépendances (nom des tâches nécessaires avant celle-ci)",
-    [t.name for t in st.session_state.tasks]
-)
+# Implémentation de la compression et décompression Huffman
+elif algorithm == "Compression et Décompression Huffman":
+    st.header("Compression et Décompression Huffman")
 
-if st.button("Ajouter la tâche"):
-    st.session_state.tasks.append(Task(task_name, task_duration, task_priority, task_dependencies))
-    st.success(f"Tâche {task_name} ajoutée avec dépendances : {', '.join(task_dependencies)}")
+    uploaded_file = st.file_uploader("Téléchargez un fichier à compresser", type=["txt"])
+    if uploaded_file:
+        file_content = uploaded_file.getvalue().decode("utf-8")
+        compressed_data, tree = huffman_compress(file_content)
+        
+        st.write("Données compressées :", compressed_data)
+        st.write("Arbre de Huffman :", tree)
+        
+        # Sauvegarder l'arbre et les données compressées dans les variables de session
+        st.session_state.compressed_data = compressed_data
+        st.session_state.tree = tree
 
-# Afficher les données ajoutées
-st.subheader("Tâches ajoutées")
-for t in st.session_state.tasks:
-    st.write(f"{t.name} - Durée: {t.duration}h, Priorité: {t.priority}, Dépendances: {', '.join(t.dependencies)}")
-
-st.subheader("Ressources ajoutées")
-for r in st.session_state.resources:
-    st.write(f"{r.name} - Capacité: {r.capacity} tâches")
-
-# Choisir l'algorithme d'ordonnancement
-st.header("Choisir l'algorithme d'ordonnancement")
-algorithm = st.selectbox(
-    "Sélectionnez un algorithme",
-    ["Ordonnancement par durée minimale", "Ordonnancement par priorité maximale", "Ordonnancement avec dépendances"],
-)
-
-# Appliquer l'algorithme choisi
-if st.button("Planifier"):
-    if algorithm == "Ordonnancement par durée minimale":
-        schedule = schedule_by_shortest_duration(st.session_state.tasks, st.session_state.resources)
-    elif algorithm == "Ordonnancement par priorité maximale":
-        schedule = schedule_by_highest_priority(st.session_state.tasks, st.session_state.resources)
-    else:
-        schedule = schedule_with_dependencies(st.session_state.tasks, st.session_state.resources)
-
-    # Générer et afficher le diagramme de Gantt
-    fig = generate_gantt_chart(schedule)
-    st.plotly_chart(fig)
+    # Décompression
+    if 'compressed_data' in st.session_state:
+        if st.button("Décompresser"):
+            decompressed_data = huffman_decompress(st.session_state.compressed_data, st.session_state.tree)
+            st.write("Données décompressées :", decompressed_data)
