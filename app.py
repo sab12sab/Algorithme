@@ -1,57 +1,111 @@
 import streamlit as st
-from graph_generator import generate_random_graph, graph_to_dict
-from dijkstra import dijkstra_fibonacci, dijkstra_binary_heap
-from huffman import huffman_compress, huffman_decompress
+from search_engine import SearchEngine
+from huffman import calculate_frequency, build_huffman_tree, generate_codes, compress, decompress
+from task_scheduler import Task, Resource, greedy_by_duration, greedy_by_priority
+import tempfile  # Pour créer un fichier temporaire
 
-# Titre de l'application Streamlit
-st.title("Application Dijkstra et Huffman")
+# --- Interface Streamlit ---
+st.sidebar.title("Choisissez une fonction")
+option = st.sidebar.selectbox("Options", ["Moteur de Recherche", "Compression de Fichiers", "Planificateur de Tâches"])
 
-# Choix de l'algorithme via un menu déroulant
-algorithm = st.sidebar.selectbox("Choisissez un algorithme", ["Dijkstra avec Tas de Fibonacci", "Dijkstra avec Tas Binaire", "Compression et Décompression Huffman"])
 
-# Implémentation du Dijkstra avec Tas de Fibonacci
-if algorithm == "Dijkstra avec Tas de Fibonacci":
-    st.header("Dijkstra avec Tas de Fibonacci")
+# --- Moteur de Recherche ---
+if option == "Moteur de Recherche":
+    st.title("Moteur de Recherche Simplifié")
     
-    # Paramètres du graphe
-    num_nodes = st.slider("Nombre de nœuds", min_value=5, max_value=50, value=10)
-    density = st.slider("Densité du graphe", min_value=0.1, max_value=1.0, value=0.5)
+    uploaded_files = st.file_uploader("Téléchargez vos fichiers texte (.txt)", type=["txt"], accept_multiple_files=True)
     
-    # Générer le graphe aléatoire
-    graph = generate_random_graph(num_nodes, density)
-    graph_dict = graph_to_dict(graph)
+    search_engine = SearchEngine()
     
-    start_node = st.selectbox("Choisissez le nœud de départ", options=list(graph_dict.keys()))
+    if uploaded_files:
+        for uploaded_file in uploaded_files:
+            content = uploaded_file.read().decode("utf-8")
+            search_engine.index_document(uploaded_file.name, content)
+        st.success(f"{len(uploaded_files)} fichier(s) indexé(s).")
     
-    # Calcul des plus courts chemins avec Dijkstra
-    distances, predecessors = dijkstra_fibonacci(graph_dict, start_node)  # Ou dijkstra_binary_heap
+    query = st.text_input("Entrez votre requête :")
+    operator = st.radio("Choisissez un opérateur :", ["ET", "OU"])
+    fuzzy = st.checkbox("Activer la recherche floue")
     
-    st.write(f"Distances depuis le nœud {start_node} :", distances)
-    st.write("Prédécesseurs :", predecessors)
+    if st.button("Rechercher"):
+        if query:
+            results = search_engine.search(query, operator=operator, fuzzy=fuzzy)
+            if results:
+                st.write("Documents trouvés :")
+                for result in results:
+                    st.write(f"- {result}")
+            else:
+                st.write("Aucun document trouvé pour votre recherche.")
 
-# Implémentation de la compression et décompression Huffman
-elif algorithm == "Compression et Décompression Huffman":
-    st.header("Compression et Décompression Huffman")
-
-    uploaded_file = st.file_uploader("Téléchargez un fichier à compresser", type=["txt"])
+# --- Compression Huffman ---
+elif option == "Compression de Fichiers":
+    st.title("Compression de Fichiers avec Huffman")
+    
+    uploaded_file = st.file_uploader("Téléchargez un fichier texte", type=["txt"])
     if uploaded_file:
-        file_content = uploaded_file.getvalue().decode("utf-8")
+        text = uploaded_file.read().decode("utf-8")
+        st.write("Contenu du fichier :")
+        st.text_area("Texte brut", text, height=200)
         
-        if not file_content:
-            st.error("Le fichier est vide. Impossible de compresser.")
-        else:
-            # Compression du fichier
-            compressed_data, tree = huffman_compress(file_content)
-            
-            st.write("Données compressées :", compressed_data)
-            st.write("Arbre de Huffman :", tree)
-            
-            # Sauvegarder l'arbre et les données compressées dans les variables de session
-            st.session_state.compressed_data = compressed_data
-            st.session_state.tree = tree
+        # Compression
+        frequencies = calculate_frequency(text)
+        huffman_tree = build_huffman_tree(frequencies)
+        codes = generate_codes(huffman_tree)
+        compressed_data = compress(text, codes)
+        
+        st.write("Taille compressée :", len(compressed_data))
+        st.write("Taux de compression :", len(compressed_data) / (len(text) * 8))
 
-    # Décompression
-    if 'compressed_data' in st.session_state:
+        # Visualiser le fichier compressé sous forme binaire
+        st.write("Contenu compressé :")
+        st.text_area("Données compressées (binaire)", compressed_data, height=200)
+
+        # Créer un fichier temporaire pour le téléchargement
+        with tempfile.NamedTemporaryFile(delete=False, mode='w', encoding='utf-8', suffix=".bin") as temp_file:
+            temp_file.write(compressed_data)
+            temp_file_path = temp_file.name
+        
+        # Bouton de téléchargement
+        st.download_button(
+            label="Télécharger le fichier compressé",
+            data=compressed_data,
+            file_name=f"{uploaded_file.name}.bin",
+            mime="application/octet-stream"
+        )
+
+        # Décompression
         if st.button("Décompresser"):
-            decompressed_data = huffman_decompress(st.session_state.compressed_data, st.session_state.tree)
-            st.write("Données décompressées :", decompressed_data)
+            decompressed_text = decompress(compressed_data, huffman_tree)
+            st.text_area("Texte décompressé", decompressed_text, height=200)
+
+
+elif option == "Planificateur de Tâches":
+    st.title("Planificateur de Tâches avec Algorithmes Gloutons")
+    
+    # Formulaire pour entrer les ressources
+    resources_input = st.text_area("Entrez les ressources séparées par une virgule", "Ressource1, Ressource2, Ressource3")
+    resources_names = resources_input.split(",")
+    resources = [Resource(name.strip()) for name in resources_names]
+
+    # Formulaire pour entrer les tâches
+    tasks_input = st.text_area("Entrez les tâches au format 'Nom, Durée, Priorité'", "Tâche 1, 3, 2\nTâche 2, 1, 1\nTâche 3, 4, 3")
+    tasks_lines = tasks_input.split("\n")
+    tasks = []
+    
+    for line in tasks_lines:
+        task_name, duration, priority = line.split(",")
+        tasks.append(Task(task_name.strip(), int(duration.strip()), int(priority.strip())))
+    
+    # Choix de l'algorithme
+    algorithm = st.selectbox("Choisissez l'algorithme de planification", ["Par Durée Minimale", "Par Priorité"])
+
+    if st.button("Planifier"):
+        if algorithm == "Par Durée Minimale":
+            schedule = greedy_by_duration(tasks, resources)
+        else:
+            schedule = greedy_by_priority(tasks, resources)
+
+        # Affichage du planning
+        st.write("Planning des tâches :")
+        for task in schedule:
+            st.write(f"{task.name} - Début: {task.start_time} - Fin: {task.end_time} - Assignée à: {task.assigned_to.name}")
