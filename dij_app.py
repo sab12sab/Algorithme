@@ -48,7 +48,7 @@ def draw_graph(graph):
     labels = nx.get_edge_attributes(G, 'weight')
     
     plt.figure(figsize=(8, 6))
-    nx.draw(G, pos, with_labels=True, node_size=2000, node_color="lightblue", font_size=12)
+    nx.draw(G, pos, with_labels=True, node_size=2000, node_color="#9b111e",edge_color="gray", font_size=12)
     nx.draw_networkx_edge_labels(G, pos, edge_labels=labels)
     st.pyplot(plt)
 

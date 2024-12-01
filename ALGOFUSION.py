@@ -88,7 +88,7 @@ elif option == "MOTEUR DE RECHERCHE":
                 for result in results:
                     st.write(f"- {result}")  # Afficher les résultats trouvés
             else:
-                st.write("Aucun document trouvé pour votre recherche.")  # Afficher si aucun document n'a été trouvé
+                st.write("Aucun document trouvé pour votre recherche.")
 
 # --- Compression Huffman ---
 elif option == "COMPRESSION DE FICHIERS":
