@@ -236,7 +236,7 @@ st.markdown("""
     }
     </style>
     <div class="footer">
-        Réalisé par  Sabrine  , Houda Erimi, Rania Kettani
+        Réalisé par  Sabrine Essadeq - Houda Erimi - Rania Kettani
     </div>
 """, unsafe_allow_html=True)
 
