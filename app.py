@@ -6,16 +6,42 @@ import tempfile  # Pour créer un fichier temporaire
 import matplotlib.pyplot as plt  # Pour dessiner le graphe avec matplotlib
 import time  # Pour mesurer le temps d'exécution de l'algorithme
 
+st.sidebar.image('logo1.jpeg', width=100)
+st.markdown(
+    """
+    <style>
+    .css-1d391kg {
+        padding-top: 0px;
+    }
+    .sidebar .sidebar-content {
+        padding-top: 0px;
+    }
+    .css-1y4v71h image {
+        display: block;
+        margin-left: 0;
+        margin-right: auto;
+        margin-top: 0;
+        position: absolute;
+    }
+    </style>
+    """, unsafe_allow_html=True)
 # --- Interface Streamlit ---
 st.sidebar.title("Choisissez une fonction")  # Titre de la barre latérale
 option = st.sidebar.selectbox("Options", ["Page d'accueil", "Moteur de Recherche", "Compression de Fichiers", "Algorithme de Dijkstra"])  # Choix entre différentes options
 
 # --- Page d'accueil ---
 if option == "Page d'accueil":
-    st.title("Bienvenue sur notre plateforme !")
+    st.image("logo_algo.jpg", use_container_width=False, width=3000, caption=None)
+
+# Titre sur la même ligne, avec ALGOFUSION en rouge et en gras
+    st.markdown("""
+    <h1 style="font-size: 50px;">Bienvenue dans  <span style="font-weight: bold; color: #9b111e;">ALGOFUSION</span></h1>
+""", unsafe_allow_html=True)
+  
     st.markdown("""
     Explorez l'innovation, découvrez des algorithmes puissants et laissez-vous inspirer par la simplicité de nos solutions. Choisissez un projet et plongez dans l'univers de la technologie à portée de main.
     """)
+    
 
     # Description de chaque programme
     st.subheader("**Compression de Données avec l'Algorithme de Huffman**")
@@ -188,3 +214,59 @@ elif option == "Algorithme de Dijkstra":
             
             st.write(f"### Temps d'exécution de l'algorithme de Dijkstra :")
             st.write(f"{execution_time:.4f} secondes.")
+
+st.markdown("""
+    <style>
+    /* Style pour le pied de page */
+    .footer {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        background-color: #9b111e; /* Couleur de l'arrière-plan */
+        color: white; /* Couleur du texte */
+        text-align: center; /* Centrer horizontalement le texte */
+        padding: 10px 0; /* Espacement vertical */
+        font-size: 14px; /* Taille de la police */
+        font-family: Arial, sans-serif; /* Police */
+        z-index: 1000; /* Priorité sur d'autres éléments */
+        display: flex; /* Flexbox pour le centrage */
+        justify-content: center; /* Centrage horizontal */
+        align-items: center; /* Centrage vertical */
+    }
+    </style>
+    <div class="footer">
+        Réalisé par  Sabrine  , Houda Erimi, Rania Kettani
+    </div>
+""", unsafe_allow_html=True)
+
+
+st.markdown("""
+    <style>
+        
+        /* Appliquer la couleur rouge (#9b111e) et le gras à tous les grands titres */
+        h1 {
+            font-weight: bold;
+            color: #9b111e;
+        }
+
+        /* Styliser la barre latérale avec la couleur #9b111e */
+        .css-1d391kg {
+            background-color: #9b111e;
+            color: white;
+        }
+
+        /* Styliser le texte de la barre latérale */
+        .css-1d391kg a {
+            color: white;
+        }
+
+        /* Styliser les éléments de la barre latérale */
+        .css-1v3fvcr {
+            background-color: #9b111e;
+        }
+    </style>
+            
+""", unsafe_allow_html=True)
+import streamlit as st
+
