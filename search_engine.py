@@ -3,7 +3,7 @@ from collections import defaultdict, Counter
 from difflib import get_close_matches
 
 class SearchEngine:
-    def __init__(self):
+    def _init_(self):
         self.index = defaultdict(list)  # Index inversé
         self.document_word_counts = defaultdict(Counter)  # Compte des mots dans chaque document
 
@@ -46,3 +46,4 @@ class SearchEngine:
 
     def find_similar_words(self, word, cutoff=0.8):
         return get_close_matches(word, self.index.keys(), n=5, cutoff=cutoff)
+  

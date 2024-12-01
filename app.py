@@ -1,16 +1,13 @@
 import streamlit as st
 from search_engine import SearchEngine
 from huffman import calculate_frequency, build_huffman_tree, generate_codes, compress, decompress
-from task_scheduler import Task, Resource, greedy_by_duration, greedy_by_priority, greedy_by_duration_and_priority
+from dij_app import dijkstra, draw_graph, generate_random_graph
 import tempfile  # Pour créer un fichier temporaire
 import matplotlib.pyplot as plt
 
-
-
 # --- Interface Streamlit ---
 st.sidebar.title("Choisissez une fonction")
-option = st.sidebar.selectbox("Options", ["Moteur de Recherche", "Compression de Fichiers", "Planificateur de Tâches"])
-
+option = st.sidebar.selectbox("Options", ["Moteur de Recherche", "Compression de Fichiers", "Algorithme de Dijkstra"])
 
 # --- Moteur de Recherche ---
 if option == "Moteur de Recherche":
@@ -81,53 +78,42 @@ elif option == "Compression de Fichiers":
             decompressed_text = decompress(compressed_data, huffman_tree)
             st.text_area("Texte décompressé", decompressed_text, height=200)
 
+# --- Algorithme de Dijkstra ---
+elif option == "Algorithme de Dijkstra":  # Suppression de l'espace avant le nom
+    st.title("Application Dijkstra avec Tas Binaire")
 
-elif option == "Planificateur de Tâches":
-    st.title("Planificateur de Tâches avec Algorithmes Gloutons")
+    # Demander à l'utilisateur de choisir un graphe
+    num_nodes = st.number_input("Nombre de nœuds", min_value=2, step=1, key="num_nodes")
+    node_names = [f"Node{i+1}" for i in range(num_nodes)]
 
-    # Formulaire pour entrer les ressources
-    resources_input = st.text_area("Entrez les ressources séparées par une virgule", "Ressource1, Ressource2, Ressource3")
-    resources_names = resources_input.split(",")
-    resources = [Resource(name.strip()) for name in resources_names]
+    # Créer un graphe vide
+    graph = {node: {} for node in node_names}
 
-    # Formulaire pour entrer les tâches
-    tasks_input = st.text_area("Entrez les tâches au format 'Nom, Durée, Priorité, Durée maximale (optionnel)'", 
-                               "Tâche 1, 3, 2, 5\nTâche 2, 1, 1\nTâche 3, 4, 3, 6")
-    tasks_lines = tasks_input.split("\n")
-    tasks = []
+    # Entrée des distances entre les nœuds
+    for i in range(num_nodes):
+        for j in range(i + 1, num_nodes):
+            distance = st.number_input(f"Distance entre {node_names[i]} et {node_names[j]} (0 = pas de connexion)", 
+                                      min_value=0, step=1, key=f"distance_{i}_{j}", format="%d")
+            if distance > 0:
+                graph[node_names[i]][node_names[j]] = distance
+                graph[node_names[j]][node_names[i]] = distance
 
-    for line in tasks_lines:
-        task_details = line.split(",")
-        task_name = task_details[0].strip()
-        duration = int(task_details[1].strip())
-        priority = int(task_details[2].strip())
-        max_duration = int(task_details[3].strip()) if len(task_details) > 3 else None
-        tasks.append(Task(task_name, duration, priority, max_duration))
+    # Choisir un nœud de départ et un nœud d'arrivée
+    start_node = st.selectbox("Choisissez le nœud de départ", node_names, key="start_node")
+    end_node = st.selectbox("Choisissez le nœud d'arrivée", node_names, key="end_node")
 
-    # Choix de l'algorithme
-    algorithm = st.selectbox("Choisissez l'algorithme de planification", ["Par Durée Minimale", "Par Priorité", "Par Durée et Priorité"])
+    if st.button("Calculer le plus court chemin"):
+        # Appel de la fonction dijkstra provenant du fichier dij_app.py
+        dist, path = dijkstra(graph, start_node, end_node)
 
-    if st.button("Planifier"):
-        if algorithm == "Par Durée Minimale":
-            schedule = greedy_by_duration(tasks, resources)
-        elif algorithm == "Par Priorité":
-            schedule = greedy_by_priority(tasks, resources)
+        # Affichage du chemin et de la distance
+        if dist[end_node] == float('inf'):
+            st.write(f"Aucun chemin disponible entre {start_node} et {end_node}.")
         else:
-            schedule = greedy_by_duration_and_priority(tasks, resources)
+            st.write(f"Le plus court chemin de {start_node} à {end_node} est :")
+            st.write(" -> ".join(path))
+            st.write(f"Distance totale : {dist[end_node]} unités.")
 
-        # Affichage du planning
-        st.write("Planning des tâches :")
-        for task in schedule:
-            st.write(f"{task.name} - Début: {task.start_time} - Fin: {task.end_time} - Assignée à: {task.assigned_to.name}")
-
-        # Visualiser le planning des ressources avec un graphique
-        fig, ax = plt.subplots()
-        for resource in resources:
-            ax.plot([task.start_time for task in schedule if task.assigned_to == resource],
-                    [task.end_time for task in schedule if task.assigned_to == resource], label=resource.name)
-
-        ax.set_xlabel("Temps")
-        ax.set_ylabel("Tâches")
-        ax.set_title("Planning des Ressources")
-        ax.legend()
-        st.pyplot(fig)
+        # Affichage des distances minimales calculées par l'algorithme de Dijkstra
+        st.write("### Distances minimales après l'algorithme de Dijkstra :")
+        st.write(dist)
