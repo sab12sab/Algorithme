@@ -27,10 +27,10 @@ st.markdown(
     """, unsafe_allow_html=True)
 # --- Interface Streamlit ---
 st.sidebar.title("Choisissez une fonction")  # Titre de la barre latérale
-option = st.sidebar.selectbox("Options", ["Page d'accueil", "Moteur de Recherche", "Compression de Fichiers", "Algorithme de Dijkstra"])  # Choix entre différentes options
+option = st.sidebar.selectbox("OPTIONS", ["PAGE D'ACCUEIL", "MOTEUR DE RECHERCHE", "COMPRESSION DE FICHIERS", "ALGORITHME DE DIJKSTRA"])  # Choix entre différentes options
 
 # --- Page d'accueil ---
-if option == "Page d'accueil":
+if option == "PAGE D'ACCUEIL":
     st.image("logo_algo.jpg", use_container_width=False, width=3000, caption=None)
 
 # Titre sur la même ligne, avec ALGOFUSION en rouge et en gras
@@ -44,25 +44,25 @@ if option == "Page d'accueil":
     
 
     # Description de chaque programme
-    st.subheader("**Compression de Données avec l'Algorithme de Huffman**")
+    st.subheader("**COMPRESSION DE DONNEES AVEC L'ALGORITHME DE HUFFMAN**")
     st.markdown("""
     Explorez l'art de réduire la taille des fichiers sans perdre d'information. Grâce à l'algorithme de Huffman, ce projet compresse des fichiers texte en optimisant la représentation des caractères, rendant les fichiers plus légers et faciles à stocker ou transmettre.
     """)
 
-    st.subheader("**Moteur de Recherche Simplifié**")
+    st.subheader("**MOTEUR DE RECHERCHE SIMPLIFIE**")
     st.markdown("""
     Trouvez ce que vous cherchez instantanément ! Ce moteur de recherche indexe des documents texte et vous permet de rechercher des mots-clés rapidement, en utilisant des opérateurs comme **ET** et **OU** pour affiner vos résultats, rendant l'exploration de grandes quantités de données simple et efficace.
     """)
 
-    st.subheader("**Algorithme de Dijkstra Optimisé**")
+    st.subheader("**ALGORITHME DE DIJKSTRA OPTIMISE**")
     st.markdown("""
     Découvrez le chemin le plus court dans un réseau complexe ! Ce projet utilise l’algorithme de Dijkstra pour optimiser le calcul des itinéraires, avec la possibilité de générer des distances aléatoires ou de les personnaliser, pour une expérience fluide et rapide.
     """)
 
 
 # --- Moteur de Recherche ---
-elif option == "Moteur de Recherche":
-    st.title("**Moteur de Recherche Simplifié**")  # Titre en gras
+elif option == "MOTEUR DE RECHERCHE":
+    st.title("**MOTEUR DE RECHERCHE SIMPLIFIE**")  # Titre en gras
     st.markdown("""
     Trouvez ce que vous cherchez instantanément ! Ce moteur de recherche indexe des documents texte et vous permet de rechercher des mots-clés rapidement, en utilisant des opérateurs comme **ET** et **OU** pour affiner vos résultats, rendant l'exploration de grandes quantités de données simple et efficace.
     """)
@@ -91,8 +91,8 @@ elif option == "Moteur de Recherche":
                 st.write("Aucun document trouvé pour votre recherche.")  # Afficher si aucun document n'a été trouvé
 
 # --- Compression Huffman ---
-elif option == "Compression de Fichiers":
-    st.title("**Compression de Données avec l'Algorithme de Huffman**")  # Titre en gras
+elif option == "COMPRESSION DE FICHIERS":
+    st.title("**COMPRESSION DE DONNEES AVEC L'ALGORITHME DE HUFFMAN**")  # Titre en gras
     st.markdown("""
     Explorez l'art de réduire la taille des fichiers sans perdre d'information. Grâce à l'algorithme de Huffman, ce projet compresse des fichiers texte en optimisant la représentation des caractères, rendant les fichiers plus légers et faciles à stocker ou transmettre.
     """)
@@ -136,8 +136,8 @@ elif option == "Compression de Fichiers":
 
 
 # --- Algorithme de Dijkstra ---
-elif option == "Algorithme de Dijkstra":
-    st.title("Application Dijkstra avec Tas Binaire et Graphe Dynamique")  # Titre de la page
+elif option == "ALGORITHME DE DIJKSTRA":
+    st.title("APPLICATION DIJKSTRA AVEC TAS BINAIRE ET GRAPHE DYNAMIQUE")  # Titre de la page
     
     # Choix du mode de création du graphe
     choix = st.radio(
