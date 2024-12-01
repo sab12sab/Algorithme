@@ -8,11 +8,38 @@ import time  # Pour mesurer le temps d'exécution de l'algorithme
 
 # --- Interface Streamlit ---
 st.sidebar.title("Choisissez une fonction")  # Titre de la barre latérale
-option = st.sidebar.selectbox("Options", ["Moteur de Recherche", "Compression de Fichiers", "Algorithme de Dijkstra"])  # Choix entre différentes options
+option = st.sidebar.selectbox("Options", ["Page d'accueil", "Moteur de Recherche", "Compression de Fichiers", "Algorithme de Dijkstra"])  # Choix entre différentes options
+
+# --- Page d'accueil ---
+if option == "Page d'accueil":
+    st.title("Bienvenue sur notre plateforme !")
+    st.markdown("""
+    Explorez l'innovation, découvrez des algorithmes puissants et laissez-vous inspirer par la simplicité de nos solutions. Choisissez un projet et plongez dans l'univers de la technologie à portée de main.
+    """)
+
+    # Description de chaque programme
+    st.subheader("**Compression de Données avec l'Algorithme de Huffman**")
+    st.markdown("""
+    Explorez l'art de réduire la taille des fichiers sans perdre d'information. Grâce à l'algorithme de Huffman, ce projet compresse des fichiers texte en optimisant la représentation des caractères, rendant les fichiers plus légers et faciles à stocker ou transmettre.
+    """)
+
+    st.subheader("**Moteur de Recherche Simplifié**")
+    st.markdown("""
+    Trouvez ce que vous cherchez instantanément ! Ce moteur de recherche indexe des documents texte et vous permet de rechercher des mots-clés rapidement, en utilisant des opérateurs comme **ET** et **OU** pour affiner vos résultats, rendant l'exploration de grandes quantités de données simple et efficace.
+    """)
+
+    st.subheader("**Algorithme de Dijkstra Optimisé**")
+    st.markdown("""
+    Découvrez le chemin le plus court dans un réseau complexe ! Ce projet utilise l’algorithme de Dijkstra pour optimiser le calcul des itinéraires, avec la possibilité de générer des distances aléatoires ou de les personnaliser, pour une expérience fluide et rapide.
+    """)
+
 
 # --- Moteur de Recherche ---
-if option == "Moteur de Recherche":
-    st.title("Moteur de Recherche Simplifié")  # Titre de la page
+elif option == "Moteur de Recherche":
+    st.title("**Moteur de Recherche Simplifié**")  # Titre en gras
+    st.markdown("""
+    Trouvez ce que vous cherchez instantanément ! Ce moteur de recherche indexe des documents texte et vous permet de rechercher des mots-clés rapidement, en utilisant des opérateurs comme **ET** et **OU** pour affiner vos résultats, rendant l'exploration de grandes quantités de données simple et efficace.
+    """)
 
     uploaded_files = st.file_uploader("Téléchargez vos fichiers texte (.txt)", type=["txt"], accept_multiple_files=True)  # Permet à l'utilisateur de télécharger plusieurs fichiers texte
     search_engine = SearchEngine()  # Initialisation du moteur de recherche
@@ -39,7 +66,10 @@ if option == "Moteur de Recherche":
 
 # --- Compression Huffman ---
 elif option == "Compression de Fichiers":
-    st.title("Compression de Fichiers avec Huffman")  # Titre de la page
+    st.title("**Compression de Données avec l'Algorithme de Huffman**")  # Titre en gras
+    st.markdown("""
+    Explorez l'art de réduire la taille des fichiers sans perdre d'information. Grâce à l'algorithme de Huffman, ce projet compresse des fichiers texte en optimisant la représentation des caractères, rendant les fichiers plus légers et faciles à stocker ou transmettre.
+    """)
 
     uploaded_file = st.file_uploader("Téléchargez un fichier texte", type=["txt"])  # Permet à l'utilisateur de télécharger un fichier texte
     if uploaded_file:  # Si un fichier est téléchargé
@@ -77,6 +107,7 @@ elif option == "Compression de Fichiers":
         if st.button("Décompresser"):  # Si l'utilisateur appuie sur le bouton de décompression
             decompressed_text = decompress(compressed_data, huffman_tree)  # Décompresser les données
             st.text_area("Texte décompressé", decompressed_text, height=200)  # Afficher le texte décompressé
+
 
 # --- Algorithme de Dijkstra ---
 elif option == "Algorithme de Dijkstra":
@@ -150,14 +181,10 @@ elif option == "Algorithme de Dijkstra":
             # Affichage des distances initiales et finales pour chaque nœud
             st.write("### Détails de chaque nœud :")
             for node in node_names:
-                st.write(f"Nœud : {node}, Distance initiale : {initial_distances[node]}, Distance finale : {'∞' if dist[node] == float('inf') else dist[node]}, Chemin : {' -> '.join(path) if dist[node] != float('inf') else 'Aucun chemin'}")
-            
+               st.markdown(f"**Nœud : {node}**\n\n"
+            f"Distance initiale : {initial_distances[node]}\n\n"
+            f"Distance finale : {'∞' if dist[node] == float('inf') else dist[node]}\n\n"
+            f"Chemin : {' -> '.join(path) if dist[node] != float('inf') else 'Aucun chemin'}\n\n")
             
             st.write(f"### Temps d'exécution de l'algorithme de Dijkstra :")
             st.write(f"{execution_time:.4f} secondes.")
-
-
-
-
-
-
