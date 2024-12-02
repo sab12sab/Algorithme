@@ -6,7 +6,7 @@ import tempfile  # Pour créer un fichier temporaire
 import matplotlib.pyplot as plt  # Pour dessiner le graphe avec matplotlib
 import time  # Pour mesurer le temps d'exécution de l'algorithme
 
-st.sidebar.image('logo1.jpeg', width=100)
+st.sidebar.image('file (1).png', width=100)
 st.markdown(
     """
     <style>
@@ -148,7 +148,6 @@ elif option == "ALGORITHME DE DIJKSTRA":
     # Initialisation du graphe et des nœuds
     graph = {}
     node_names = []
-    
     if choix == "Générer aléatoirement":  # Si l'utilisateur choisit de générer un graphe aléatoire
         num_nodes = st.number_input("Nombre de nœuds", min_value=2, step=1, key="num_nodes_random")  # Demander le nombre de nœuds
         
