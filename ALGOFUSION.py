@@ -44,17 +44,17 @@ if option == "PAGE D'ACCUEIL":
     
 
     # Description de chaque programme
-    st.subheader("**COMPRESSION DE DONNEES AVEC L'ALGORITHME DE HUFFMAN**")
+    st.subheader("*COMPRESSION DE DONNEES AVEC L'ALGORITHME DE HUFFMAN*")
     st.markdown("""
     Explorez l'art de réduire la taille des fichiers sans perdre d'information. Grâce à l'algorithme de Huffman, ce projet compresse des fichiers texte en optimisant la représentation des caractères, rendant les fichiers plus légers et faciles à stocker ou transmettre.
     """)
 
-    st.subheader("**MOTEUR DE RECHERCHE SIMPLIFIE**")
+    st.subheader("*MOTEUR DE RECHERCHE SIMPLIFIE*")
     st.markdown("""
-    Trouvez ce que vous cherchez instantanément ! Ce moteur de recherche indexe des documents texte et vous permet de rechercher des mots-clés rapidement, en utilisant des opérateurs comme **ET** et **OU** pour affiner vos résultats, rendant l'exploration de grandes quantités de données simple et efficace.
+    Trouvez ce que vous cherchez instantanément ! Ce moteur de recherche indexe des documents texte et vous permet de rechercher des mots-clés rapidement, en utilisant des opérateurs comme *ET* et *OU* pour affiner vos résultats, rendant l'exploration de grandes quantités de données simple et efficace.
     """)
 
-    st.subheader("**ALGORITHME DE DIJKSTRA OPTIMISE**")
+    st.subheader("*ALGORITHME DE DIJKSTRA OPTIMISE*")
     st.markdown("""
     Découvrez le chemin le plus court dans un réseau complexe ! Ce projet utilise l’algorithme de Dijkstra pour optimiser le calcul des itinéraires, avec la possibilité de générer des distances aléatoires ou de les personnaliser, pour une expérience fluide et rapide.
     """)
@@ -62,9 +62,9 @@ if option == "PAGE D'ACCUEIL":
 
 # --- Moteur de Recherche ---
 elif option == "MOTEUR DE RECHERCHE":
-    st.title("**MOTEUR DE RECHERCHE SIMPLIFIE**")  # Titre en gras
+    st.title("*MOTEUR DE RECHERCHE SIMPLIFIE*")  # Titre en gras
     st.markdown("""
-    Trouvez ce que vous cherchez instantanément ! Ce moteur de recherche indexe des documents texte et vous permet de rechercher des mots-clés rapidement, en utilisant des opérateurs comme **ET** et **OU** pour affiner vos résultats, rendant l'exploration de grandes quantités de données simple et efficace.
+    Trouvez ce que vous cherchez instantanément ! Ce moteur de recherche indexe des documents texte et vous permet de rechercher des mots-clés rapidement, en utilisant des opérateurs comme *ET* et *OU* pour affiner vos résultats, rendant l'exploration de grandes quantités de données simple et efficace.
     """)
 
     uploaded_files = st.file_uploader("Téléchargez vos fichiers texte (.txt)", type=["txt"], accept_multiple_files=True)  # Permet à l'utilisateur de télécharger plusieurs fichiers texte
@@ -213,7 +213,7 @@ elif option == "ALGORITHME DE DIJKSTRA":
             # Affichage des distances initiales et finales pour chaque nœud
             st.write("### Détails de chaque nœud :")
             for node in node_names:
-               st.markdown(f"**Nœud : {node}**\n\n"
+               st.markdown(f"*Nœud : {node}*\n\n"
             f"Distance initiale : {initial_distances[node]}\n\n"
             f"Distance finale : {'∞' if dist[node] == float('inf') else dist[node]}\n\n"
             f"Chemin : {' -> '.join(path) if dist[node] != float('inf') else 'Aucun chemin'}\n\n")
@@ -274,5 +274,4 @@ st.markdown("""
     </style>
             
 """, unsafe_allow_html=True)
-import streamlit as st
 
