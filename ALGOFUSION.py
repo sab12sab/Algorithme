@@ -109,8 +109,16 @@ elif option == "COMPRESSION DE FICHIERS":
         codes = generate_codes(huffman_tree)  # Générer les codes Huffman
         compressed_data = compress(text, codes)  # Compresser les données avec les codes Huffman
 
-        st.write("Taille compressée :", len(compressed_data))  # Afficher la taille du fichier compressé
-        st.write("Taux de compression :", len(compressed_data) / (len(text) * 8))  # Calculer et afficher le taux de compression
+        # Taille avant compression (en bits)
+        original_size = len(text) * 8  # Taille en bits du texte original (1 caractère = 8 bits)
+
+        # Taille après compression (en bits)
+        compressed_size_bits = sum(len(codes[char]) for char in text)  # Compter les bits dans la compression
+
+        # Afficher les tailles avant et après compression
+        st.write(f"Taille originale : {original_size} bits")
+        st.write(f"Taille compressée : {compressed_size_bits} bits")
+        st.write(f"Taux de compression : {compressed_size_bits / original_size:.4f}")  # Calculer et afficher le taux de compression
 
         # Visualiser le fichier compressé sous forme binaire
         st.write("Contenu compressé :")
@@ -131,9 +139,8 @@ elif option == "COMPRESSION DE FICHIERS":
 
         # Décompression
         if st.button("Décompresser"):  # Si l'utilisateur appuie sur le bouton de décompression
-            decompressed_text = decompress(compressed_data, huffman_tree)  # Décompresser les données
+            decompressed_text = decompress(compressed_data.replace(" ", ""), huffman_tree)  # Décompresser les données
             st.text_area("Texte décompressé", decompressed_text, height=200)  # Afficher le texte décompressé
-
 
 # --- Algorithme de Dijkstra ---
 elif option == "ALGORITHME DE DIJKSTRA":

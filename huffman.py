@@ -37,8 +37,10 @@ def generate_codes(node, current_code="", codes={}):
     generate_codes(node.right, current_code + "1", codes)
     return codes
 
+# Fonction compressée modifiée pour ajouter un espace entre chaque code binaire
 def compress(text, codes):
-    return "".join(codes[char] for char in text)
+    # Ajouter un espace entre chaque code binaire
+    return " ".join(codes[char] for char in text)
 
 def decompress(binary_data, root):
     result = []
@@ -49,3 +51,29 @@ def decompress(binary_data, root):
             result.append(node.char)
             node = root
     return "".join(result)
+
+# Exemple d'utilisation
+text = "hello world"
+frequencies = calculate_frequency(text)  # Calculer la fréquence des caractères
+huffman_tree = build_huffman_tree(frequencies)  # Construire l'arbre Huffman
+codes = generate_codes(huffman_tree)  # Générer les codes Huffman
+compressed_data = compress(text, codes)  # Compresser les données avec les codes Huffman
+
+# Calcul de la taille avant compression (en bits)
+original_size = len(text) * 8  # Taille en bits du texte original (1 caractère = 8 bits)
+
+# Calcul de la taille après compression (en bits)
+compressed_size_bits = sum(len(codes[char]) for char in text)  # Compter les bits dans la compression
+compressed_size_bits_with_spaces = len(compressed_data.replace(" ", ""))  # Compter sans espaces
+
+# Afficher les tailles
+print(f"Taille originale : {original_size} bits")
+print(f"Taille compressée (sans espaces) : {compressed_size_bits_with_spaces} bits")
+print(f"Taille compressée (avec espaces) : {compressed_size_bits} bits")
+print("Texte compressé avec espaces entre les caractères :", compressed_data)
+
+# Décompresser le texte pour vérifier
+decompressed_text = decompress(compressed_data.replace(" ", ""), huffman_tree)
+print("Texte décompressé :", decompressed_text)
+
+
