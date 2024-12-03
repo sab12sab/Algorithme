@@ -142,20 +142,38 @@ elif option == "COMPRESSION DE FICHIERS":
             decompressed_text = decompress(compressed_data.replace(" ", ""), huffman_tree)
             st.text_area("Texte décompressé", decompressed_text, height=200)
 
+
         # Visualisation de l'arbre de Huffman
         st.write("### Arbre de Huffman :")
-        graph, pos = plot_huffman_tree(huffman_tree)
-    
-        # Dessiner l'arbre avec Matplotlib
+        graph, pos, leaf_positions = plot_huffman_tree(huffman_tree)  # Correction ici
+
+        # Placer les feuilles en bas dans l'ordre croissant des fréquences
+        sorted_leaves = sorted(frequencies.items(), key=lambda item: item[1])
+        leaf_x = 0
+        for char, _ in sorted_leaves:
+        # Ajuster les positions des feuilles pour qu'elles soient alignées horizontalement
+         leaf_positions[char] = (leaf_x, -2)  # Placer les feuilles à y = -2
+         leaf_x += 1  # Décaler les feuilles à gauche -> droite
+
+      # Dessiner l'arbre avec Matplotlib
         plt.figure(figsize=(10, 8))
         nx.draw(graph, pos, with_labels=True, node_size=2000, node_color="skyblue", font_size=10, font_weight="bold")
-    
-        # Ajouter les étiquettes des arêtes (0 pour gauche, 1 pour droite)
-        edge_labels = {(u, v): d['label'] for u, v, d in graph.edges(data=True)}
-        nx.draw_networkx_edge_labels(graph, pos, edge_labels=edge_labels, font_size=12, font_color="red")
 
+     # Ajouter les étiquettes des arêtes (0 pour gauche, 1 pour droite)
+        edge_labels = {(u, v): d['label'] for u, v, d in graph.edges(data=True)}  # Récupérer les étiquettes des arêtes
+        nx.draw_networkx_edge_labels(graph, pos, edge_labels=edge_labels, font_size=12, font_color="red")  # Affichage des étiquettes
+
+# Placer les feuilles à leurs positions définies
+        for char, (x, y) in leaf_positions.items():
+         pos[char] = (x, y)  # Mettre à jour les positions des feuilles
+
+# Redessiner les nœuds avec les nouvelles positions des feuilles
+         nx.draw(graph, pos, with_labels=True, node_size=2000, node_color="skyblue", font_size=10, font_weight="bold")
+
+# Titre et affichage dans Streamlit
         plt.title("Arbre de Huffman avec étiquettes 0 et 1")
         st.pyplot(plt)
+
 
     
 # --- Algorithme de Dijkstra ---
@@ -290,4 +308,3 @@ st.markdown("""
     </style>
             
 """, unsafe_allow_html=True)
-

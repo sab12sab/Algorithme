@@ -10,26 +10,34 @@ import networkx as nx
 
 
 
+import heapq
+import networkx as nx
+import matplotlib.pyplot as plt
+from collections import defaultdict
 
-
-
-
-# Définition des classes et fonctions nécessaires à l'algorithme de Huffman
+# Classe pour représenter les nœuds de l'arbre
 class Node:
     def __init__(self, char, freq):
         self.char = char
         self.freq = freq
-        self.left = None
-        self.right = None
-
+        self.left = self.right = None
+        
     def __lt__(self, other):
         return self.freq < other.freq
 
+# Calcul des fréquences des caractères
 def calculate_frequency(text):
-    return Counter(text)
+    # Filtrer les caractères non désirés (par exemple, espaces, tabulations)
+    valid_chars = [char for char in text if char.isalnum()]  # Garder uniquement les caractères alphanumériques
+    frequencies = {}
+    for char in valid_chars:
+        frequencies[char] = frequencies.get(char, 0) + 1
+    return frequencies
 
+# Construction de l'arbre de Huffman
 def build_huffman_tree(frequencies):
-    heap = [Node(char, freq) for char, freq in frequencies.items()]
+    # Trier les caractères par fréquence (ordre croissant)
+    heap = [Node(char, freq) for char, freq in sorted(frequencies.items(), key=lambda item: item[1])]
     heapq.heapify(heap)
     
     while len(heap) > 1:
@@ -41,6 +49,43 @@ def build_huffman_tree(frequencies):
         heapq.heappush(heap, merged)
     
     return heap[0]
+
+# Fonction récursive pour tracer l'arbre de Huffman avec étiquettes sur les arêtes
+def plot_huffman_tree(node, graph=None, pos=None, x=0, y=0, layer=1, parent=None, edge_label=None, leaf_positions=None):
+    if graph is None:
+        graph = nx.DiGraph()
+        pos = {}
+        leaf_positions = {}
+
+    if node.char:
+        label = f"{node.char}:{node.freq}"
+        # Placer les feuilles (les caractères) de manière horizontale (de gauche à droite)
+        leaf_positions[node.char] = (x, y)
+    else:
+        label = f"{node.freq}"
+    
+    pos[label] = (x, y)
+    graph.add_node(label)
+    
+    if parent:
+        graph.add_edge(parent, label, label=edge_label)  # Ajouter l'étiquette de l'arête
+    
+    if node.left:
+        plot_huffman_tree(node.left, graph, pos, x=x - 1 / layer, y=y - 1, layer=layer * 2, parent=label, edge_label='0', leaf_positions=leaf_positions)  # Étiquette '0' pour l'arête gauche
+        
+    if node.right:
+        plot_huffman_tree(node.right, graph, pos, x=x + 1 / layer, y=y - 1, layer=layer * 2, parent=label, edge_label='1', leaf_positions=leaf_positions)  # Étiquette '1' pour l'arête droite
+        
+    return graph, pos, leaf_positions
+
+
+
+
+
+
+# Définition des classes et fonctions nécessaires à l'algorithme de Huffman
+
+
 
 def generate_codes(node, current_code="", codes={}):
     if node is None:
@@ -64,27 +109,5 @@ def decompress(binary_data, root):
             node = root
     return "".join(result)
 
-# Fonction récursive pour tracer l'arbre de Huffman avec étiquettes sur les arêtes
-def plot_huffman_tree(node, graph=None, pos=None, x=0, y=0, layer=1, parent=None, edge_label=None):
-    if graph is None:
-        graph = nx.DiGraph()
-        pos = {}
-    
-    if node.char:
-        label = f"{node.char}:{node.freq}"
-    else:
-        label = f"{node.freq}"
-    
-    pos[label] = (x, y)
-    graph.add_node(label)
-    
-    if parent:
-        graph.add_edge(parent, label, label=edge_label)  # Ajouter l'étiquette de l'arête
-    
-    if node.left:
-        plot_huffman_tree(node.left, graph, pos, x=x - 1 / layer, y=y - 1, layer=layer * 2, parent=label, edge_label='0')  # Étiquette '0' pour l'arête gauche
-        
-    if node.right:
-        plot_huffman_tree(node.right, graph, pos, x=x + 1 / layer, y=y - 1, layer=layer * 2, parent=label, edge_label='1')  # Étiquette '1' pour l'arête droite
-        
-    return graph, pos
+
+
