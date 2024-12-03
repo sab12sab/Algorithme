@@ -1,9 +1,9 @@
 import streamlit as st
 from collections import Counter
 import heapq
-import tempfile
+import pandas as pd  # Pour créer et afficher le tableau
 
-# Définition des fonctions nécessaires à l'algorithme de Huffman
+# Définition des classes et fonctions nécessaires à l'algorithme de Huffman
 class Node:
     def __init__(self, char, freq):
         self.char = char
@@ -41,7 +41,7 @@ def generate_codes(node, current_code="", codes={}):
     return codes
 
 def compress(text, codes):
-    return " ".join(codes[char] for char in text)
+    return "".join(codes[char] for char in text)
 
 def decompress(binary_data, root):
     result = []
@@ -52,5 +52,4 @@ def decompress(binary_data, root):
             result.append(node.char)
             node = root
     return "".join(result)
-
 

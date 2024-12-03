@@ -5,6 +5,8 @@ from dij_app import dijkstra, draw_graph, generate_random_graph  # Importation d
 import tempfile  # Pour créer un fichier temporaire
 import matplotlib.pyplot as plt  # Pour dessiner le graphe avec matplotlib
 import time  # Pour mesurer le temps d'exécution de l'algorithme
+import pandas as pd # Importation de pandas pour la création du tableau
+
 
 st.sidebar.image('file (1).png', width=100)
 st.markdown(
@@ -109,6 +111,9 @@ elif option == "COMPRESSION DE FICHIERS":
         codes = generate_codes(huffman_tree)  # Générer les codes Huffman
         compressed_data = compress(text, codes)  # Compresser les données avec les codes Huffman
 
+        # Ajouter des espaces entre chaque caractère compressé
+        compressed_data_with_spaces = ' '.join([codes[char] for char in text])
+
         # Taille avant compression (en bits)
         original_size = len(text) * 8  # Taille en bits du texte original (1 caractère = 8 bits)
 
@@ -120,26 +125,42 @@ elif option == "COMPRESSION DE FICHIERS":
         st.write(f"Taille compressée : {compressed_size_bits} bits")
         st.write(f"Taux de compression : {compressed_size_bits / original_size:.4f}")  # Calculer et afficher le taux de compression
 
-        # Visualiser le fichier compressé sous forme binaire
+        # Visualiser le fichier compressé sous forme binaire avec espaces
         st.write("Contenu compressé :")
-        st.text_area("Données compressées (binaire)", compressed_data, height=200)  # Afficher les données compressées
+        st.text_area("Données compressées (binaire, avec espaces)", compressed_data_with_spaces, height=200)  # Afficher les données compressées avec espaces
+
+        # Affichage du tableau des lettres, fréquences et codes Huffman
+        
+        # Créer une liste contenant les lettres, leurs fréquences et leurs codes
+        table_data = {
+            "Lettre": list(frequencies.keys()),
+            "Fréquence": list(frequencies.values()),
+            "Code Huffman": [codes[char] for char in frequencies.keys()]
+        }
+
+        # Convertir les données en DataFrame pour un affichage propre
+        df = pd.DataFrame(table_data)
+
+        # Afficher le tableau dans Streamlit
+        st.write("### Tableau des lettres, fréquences et codes Huffman :")
+        st.dataframe(df)  # Affichage sous forme de tableau interactif dans Streamlit
 
         # Créer un fichier temporaire pour le téléchargement
         with tempfile.NamedTemporaryFile(delete=False, mode='w', encoding='utf-8', suffix=".bin") as temp_file:
-            temp_file.write(compressed_data)  # Écrire les données compressées dans un fichier temporaire
+            temp_file.write(compressed_data_with_spaces)  # Écrire les données compressées avec espaces dans un fichier temporaire
             temp_file_path = temp_file.name  # Sauvegarder le chemin du fichier temporaire
         
         # Bouton de téléchargement
         st.download_button(
             label="Télécharger le fichier compressé",  # Étiquette du bouton
-            data=compressed_data,  # Les données compressées à télécharger
+            data=compressed_data_with_spaces,  # Les données compressées avec espaces à télécharger
             file_name=f"{uploaded_file.name}.bin",  # Nom du fichier compressé
             mime="application/octet-stream"  # Type MIME du fichier
         )
 
         # Décompression
         if st.button("Décompresser"):  # Si l'utilisateur appuie sur le bouton de décompression
-            decompressed_text = decompress(compressed_data.replace(" ", ""), huffman_tree)  # Décompresser les données
+            decompressed_text = decompress(compressed_data.replace(" ", ""), huffman_tree)  # Décompresser les données sans les espaces
             st.text_area("Texte décompressé", decompressed_text, height=200)  # Afficher le texte décompressé
 
 # --- Algorithme de Dijkstra ---
