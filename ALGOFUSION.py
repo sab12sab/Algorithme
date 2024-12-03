@@ -146,12 +146,18 @@ elif option == "COMPRESSION DE FICHIERS":
         st.write("### Arbre de Huffman :")
         graph, pos = plot_huffman_tree(huffman_tree)
     
-        # Affichage avec Matplotlib
+        # Dessiner l'arbre avec Matplotlib
         plt.figure(figsize=(10, 8))
         nx.draw(graph, pos, with_labels=True, node_size=2000, node_color="skyblue", font_size=10, font_weight="bold")
-        plt.title("Arbre de Huffman")
+    
+        # Ajouter les étiquettes des arêtes (0 pour gauche, 1 pour droite)
+        edge_labels = {(u, v): d['label'] for u, v, d in graph.edges(data=True)}
+        nx.draw_networkx_edge_labels(graph, pos, edge_labels=edge_labels, font_size=12, font_color="red")
+
+        plt.title("Arbre de Huffman avec étiquettes 0 et 1")
         st.pyplot(plt)
 
+    
 # --- Algorithme de Dijkstra ---
 elif option == "ALGORITHME DE DIJKSTRA":
     st.title("APPLICATION DIJKSTRA AVEC TAS BINAIRE ET GRAPHE DYNAMIQUE")  # Titre de la page

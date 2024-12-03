@@ -64,7 +64,8 @@ def decompress(binary_data, root):
             node = root
     return "".join(result)
 
-def plot_huffman_tree(node, graph=None, pos=None, x=0, y=0, layer=1):
+# Fonction récursive pour tracer l'arbre de Huffman avec étiquettes sur les arêtes
+def plot_huffman_tree(node, graph=None, pos=None, x=0, y=0, layer=1, parent=None, edge_label=None):
     if graph is None:
         graph = nx.DiGraph()
         pos = {}
@@ -77,14 +78,13 @@ def plot_huffman_tree(node, graph=None, pos=None, x=0, y=0, layer=1):
     pos[label] = (x, y)
     graph.add_node(label)
     
+    if parent:
+        graph.add_edge(parent, label, label=edge_label)  # Ajouter l'étiquette de l'arête
+    
     if node.left:
-        left_label = f"{node.left.char}:{node.left.freq}" if node.left.char else f"{node.left.freq}"
-        graph.add_edge(label, left_label)
-        plot_huffman_tree(node.left, graph, pos, x=x - 1 / layer, y=y - 1, layer=layer * 2)
+        plot_huffman_tree(node.left, graph, pos, x=x - 1 / layer, y=y - 1, layer=layer * 2, parent=label, edge_label='0')  # Étiquette '0' pour l'arête gauche
         
     if node.right:
-        right_label = f"{node.right.char}:{node.right.freq}" if node.right.char else f"{node.right.freq}"
-        graph.add_edge(label, right_label)
-        plot_huffman_tree(node.right, graph, pos, x=x + 1 / layer, y=y - 1, layer=layer * 2)
+        plot_huffman_tree(node.right, graph, pos, x=x + 1 / layer, y=y - 1, layer=layer * 2, parent=label, edge_label='1')  # Étiquette '1' pour l'arête droite
         
     return graph, pos
