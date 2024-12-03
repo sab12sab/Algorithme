@@ -1,12 +1,12 @@
 import streamlit as st  # Importation de Streamlit pour créer l'interface utilisateur
 from search_engine import SearchEngine  # Importation du moteur de recherche
-from huffman import calculate_frequency, build_huffman_tree, generate_codes, compress, decompress  # Importation des fonctions de compression Huffman
+from huffman import calculate_frequency, build_huffman_tree, generate_codes, compress, decompress,plot_huffman_tree  # Importation des fonctions de compression Huffman
 from dij_app import dijkstra, draw_graph, generate_random_graph  # Importation de l'algorithme de Dijkstra et de la fonction pour dessiner le graphe
 import tempfile  # Pour créer un fichier temporaire
 import matplotlib.pyplot as plt  # Pour dessiner le graphe avec matplotlib
 import time  # Pour mesurer le temps d'exécution de l'algorithme
 import pandas as pd # Importation de pandas pour la création du tableau
-
+import networkx as nx
 
 st.sidebar.image('file (1).png', width=100)
 st.markdown(
@@ -94,74 +94,63 @@ elif option == "MOTEUR DE RECHERCHE":
 
 # --- Compression Huffman ---
 elif option == "COMPRESSION DE FICHIERS":
-    st.title("**COMPRESSION DE DONNEES AVEC L'ALGORITHME DE HUFFMAN**")  # Titre en gras
-    st.markdown("""
-    Explorez l'art de réduire la taille des fichiers sans perdre d'information. Grâce à l'algorithme de Huffman, ce projet compresse des fichiers texte en optimisant la représentation des caractères, rendant les fichiers plus légers et faciles à stocker ou transmettre.
-    """)
-
-    uploaded_file = st.file_uploader("Téléchargez un fichier texte", type=["txt"])  # Permet à l'utilisateur de télécharger un fichier texte
-    if uploaded_file:  # Si un fichier est téléchargé
-        text = uploaded_file.read().decode("utf-8")  # Lire le contenu du fichier et le décoder
-        st.write("Contenu du fichier :")  # Afficher le texte brut du fichier
-        st.text_area("Texte brut", text, height=200)  # Afficher le texte dans une zone de texte
+    st.title("**COMPRESSION DE DONNEES AVEC L'ALGORITHME DE HUFFMAN**")
+    uploaded_file = st.file_uploader("Téléchargez un fichier texte", type=["txt"])
+    if uploaded_file:
+        text = uploaded_file.read().decode("utf-8")
+        st.write("Contenu du fichier :")
+        st.text_area("Texte brut", text, height=200)
 
         # Compression Huffman
-        frequencies = calculate_frequency(text)  # Calculer la fréquence des caractères
-        huffman_tree = build_huffman_tree(frequencies)  # Construire l'arbre Huffman
-        codes = generate_codes(huffman_tree)  # Générer les codes Huffman
-        compressed_data = compress(text, codes)  # Compresser les données avec les codes Huffman
+        frequencies = calculate_frequency(text)
+        huffman_tree = build_huffman_tree(frequencies)
+        codes = generate_codes(huffman_tree)
+        compressed_data = compress(text, codes)
 
-        # Ajouter des espaces entre chaque caractère compressé
-        compressed_data_with_spaces = ' '.join([codes[char] for char in text])
-
-        # Taille avant compression (en bits)
-        original_size = len(text) * 8  # Taille en bits du texte original (1 caractère = 8 bits)
-
-        # Taille après compression (en bits)
-        compressed_size_bits = sum(len(codes[char]) for char in text)  # Compter les bits dans la compression
-
-        # Afficher les tailles avant et après compression
+        # Affichage des tailles avant et après compression
+        original_size = len(text) * 8
+        compressed_size_bits = sum(len(codes[char]) for char in text)
         st.write(f"Taille originale : {original_size} bits")
         st.write(f"Taille compressée : {compressed_size_bits} bits")
-        st.write(f"Taux de compression : {compressed_size_bits / original_size:.4f}")  # Calculer et afficher le taux de compression
+        st.write(f"Taux de compression : {compressed_size_bits / original_size:.4f}")
 
-        # Visualiser le fichier compressé sous forme binaire avec espaces
+        # Affichage des données compressées
+        compressed_data_with_spaces = ' '.join([codes[char] for char in text])
         st.write("Contenu compressé :")
-        st.text_area("Données compressées (binaire, avec espaces)", compressed_data_with_spaces, height=200)  # Afficher les données compressées avec espaces
+        st.text_area("Données compressées (binaire, avec espaces)", compressed_data_with_spaces, height=200)
 
-        # Affichage du tableau des lettres, fréquences et codes Huffman
-        
-        # Créer une liste contenant les lettres, leurs fréquences et leurs codes
+        # Table des lettres, fréquences et codes
         table_data = {
             "Lettre": list(frequencies.keys()),
             "Fréquence": list(frequencies.values()),
             "Code Huffman": [codes[char] for char in frequencies.keys()]
         }
-
-        # Convertir les données en DataFrame pour un affichage propre
         df = pd.DataFrame(table_data)
-
-        # Afficher le tableau dans Streamlit
         st.write("### Tableau des lettres, fréquences et codes Huffman :")
-        st.dataframe(df)  # Affichage sous forme de tableau interactif dans Streamlit
+        st.dataframe(df)
 
-        # Créer un fichier temporaire pour le téléchargement
-        with tempfile.NamedTemporaryFile(delete=False, mode='w', encoding='utf-8', suffix=".bin") as temp_file:
-            temp_file.write(compressed_data_with_spaces)  # Écrire les données compressées avec espaces dans un fichier temporaire
-            temp_file_path = temp_file.name  # Sauvegarder le chemin du fichier temporaire
-        
-        # Bouton de téléchargement
+        # Téléchargement du fichier compressé
         st.download_button(
-            label="Télécharger le fichier compressé",  # Étiquette du bouton
-            data=compressed_data_with_spaces,  # Les données compressées avec espaces à télécharger
-            file_name=f"{uploaded_file.name}.bin",  # Nom du fichier compressé
-            mime="application/octet-stream"  # Type MIME du fichier
+            label="Télécharger le fichier compressé",
+            data=compressed_data_with_spaces,
+            file_name=f"{uploaded_file.name}.bin",
+            mime="application/octet-stream"
         )
 
         # Décompression
-        if st.button("Décompresser"):  # Si l'utilisateur appuie sur le bouton de décompression
-            decompressed_text = decompress(compressed_data.replace(" ", ""), huffman_tree)  # Décompresser les données sans les espaces
-            st.text_area("Texte décompressé", decompressed_text, height=200)  # Afficher le texte décompressé
+        if st.button("Décompresser"):
+            decompressed_text = decompress(compressed_data.replace(" ", ""), huffman_tree)
+            st.text_area("Texte décompressé", decompressed_text, height=200)
+
+        # Visualisation de l'arbre de Huffman
+        st.write("### Arbre de Huffman :")
+        graph, pos = plot_huffman_tree(huffman_tree)
+    
+        # Affichage avec Matplotlib
+        plt.figure(figsize=(10, 8))
+        nx.draw(graph, pos, with_labels=True, node_size=2000, node_color="skyblue", font_size=10, font_weight="bold")
+        plt.title("Arbre de Huffman")
+        st.pyplot(plt)
 
 # --- Algorithme de Dijkstra ---
 elif option == "ALGORITHME DE DIJKSTRA":

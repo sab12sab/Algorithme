@@ -2,6 +2,17 @@ import streamlit as st
 from collections import Counter
 import heapq
 import pandas as pd  # Pour créer et afficher le tableau
+import matplotlib.pyplot as plt
+import networkx as nx
+
+
+
+
+
+
+
+
+
 
 # Définition des classes et fonctions nécessaires à l'algorithme de Huffman
 class Node:
@@ -53,3 +64,27 @@ def decompress(binary_data, root):
             node = root
     return "".join(result)
 
+def plot_huffman_tree(node, graph=None, pos=None, x=0, y=0, layer=1):
+    if graph is None:
+        graph = nx.DiGraph()
+        pos = {}
+    
+    if node.char:
+        label = f"{node.char}:{node.freq}"
+    else:
+        label = f"{node.freq}"
+    
+    pos[label] = (x, y)
+    graph.add_node(label)
+    
+    if node.left:
+        left_label = f"{node.left.char}:{node.left.freq}" if node.left.char else f"{node.left.freq}"
+        graph.add_edge(label, left_label)
+        plot_huffman_tree(node.left, graph, pos, x=x - 1 / layer, y=y - 1, layer=layer * 2)
+        
+    if node.right:
+        right_label = f"{node.right.char}:{node.right.freq}" if node.right.char else f"{node.right.freq}"
+        graph.add_edge(label, right_label)
+        plot_huffman_tree(node.right, graph, pos, x=x + 1 / layer, y=y - 1, layer=layer * 2)
+        
+    return graph, pos
