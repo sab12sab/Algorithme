@@ -4,16 +4,8 @@ import heapq
 import pandas as pd  # Pour créer et afficher le tableau
 import matplotlib.pyplot as plt
 import networkx as nx
-
-
-
-
-
-
-import heapq
-import networkx as nx
-import matplotlib.pyplot as plt
 from collections import defaultdict
+import re
 
 # Classe pour représenter les nœuds de l'arbre
 class Node:
@@ -26,13 +18,20 @@ class Node:
         return self.freq < other.freq
 
 # Calcul des fréquences des caractères
+
+
+
+
 def calculate_frequency(text):
-    # Filtrer les caractères non désirés (par exemple, espaces, tabulations)
-    valid_chars = [char for char in text if char.isalnum()]  # Garder uniquement les caractères alphanumériques
+    # Conserver uniquement les caractères alphanumériques, les accents, les espaces et les signes de ponctuation spécifiés
+    cleaned_text = re.sub(r"[^a-zA-Z0-9 .!,;:éèàç']", '', text)  # Inclut les caractères accentués et la ponctuation choisie
+    cleaned_text = re.sub(r'\s+', ' ', cleaned_text).strip()  # Remplace plusieurs espaces par un seul et supprime les espaces aux extrémités
+    
     frequencies = {}
-    for char in valid_chars:
+    for char in cleaned_text:
         frequencies[char] = frequencies.get(char, 0) + 1
     return frequencies
+
 
 # Construction de l'arbre de Huffman
 def build_huffman_tree(frequencies):
@@ -78,14 +77,7 @@ def plot_huffman_tree(node, graph=None, pos=None, x=0, y=0, layer=1, parent=None
         
     return graph, pos, leaf_positions
 
-
-
-
-
-
 # Définition des classes et fonctions nécessaires à l'algorithme de Huffman
-
-
 
 def generate_codes(node, current_code="", codes={}):
     if node is None:
