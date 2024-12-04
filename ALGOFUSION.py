@@ -161,7 +161,7 @@ elif option == "COMPRESSION DE FICHIERS":
 
      # Ajouter les étiquettes des arêtes (0 pour gauche, 1 pour droite)
         edge_labels = {(u, v): d['label'] for u, v, d in graph.edges(data=True)}  # Récupérer les étiquettes des arêtes
-        nx.draw_networkx_edge_labels(graph, pos, edge_labels=edge_labels, font_size=12, font_color="red")  # Affichage des étiquettes
+        nx.draw_networkx_edge_labels(graph, pos, edge_labels=edge_labels, font_size=12, font_color="#9b111e")  # Affichage des étiquettes
 
 # Placer les feuilles à leurs positions définies
         for char, (x, y) in leaf_positions.items():
