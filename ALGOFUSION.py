@@ -157,7 +157,7 @@ elif option == "COMPRESSION DE FICHIERS":
 
       # Dessiner l'arbre avec Matplotlib
         plt.figure(figsize=(10, 8))
-        nx.draw(graph, pos, with_labels=True, node_size=2000, node_color="skyblue", font_size=10, font_weight="bold")
+        nx.draw(graph, pos, with_labels=True, node_size=2000, node_color="#9b111e", edge_color="gray", font_size=10, font_weight="bold")
 
      # Ajouter les étiquettes des arêtes (0 pour gauche, 1 pour droite)
         edge_labels = {(u, v): d['label'] for u, v, d in graph.edges(data=True)}  # Récupérer les étiquettes des arêtes
@@ -168,7 +168,7 @@ elif option == "COMPRESSION DE FICHIERS":
          pos[char] = (x, y)  # Mettre à jour les positions des feuilles
 
 # Redessiner les nœuds avec les nouvelles positions des feuilles
-         nx.draw(graph, pos, with_labels=True, node_size=2000, node_color="skyblue", font_size=10, font_weight="bold")
+         nx.draw(graph, pos, with_labels=True, node_size=2000, node_color="#9b111e", edge_color="gray", font_size=10, font_weight="bold")
 
 # Titre et affichage dans Streamlit
         plt.title("Arbre de Huffman avec étiquettes 0 et 1")
