@@ -22,15 +22,18 @@ class Node:
 
 
 
+
+
 def calculate_frequency(text):
     # Conserver uniquement les caractères alphanumériques, les accents, les espaces et les signes de ponctuation spécifiés
-    cleaned_text = re.sub(r"[^a-zA-Z0-9 .!,;:éèàç']", '', text)  # Inclut les caractères accentués et la ponctuation choisie
+    cleaned_text = re.sub(r"[^a-zA-Z0-9 .!,;:éèàç?']", '', text)  # Inclut les caractères accentués et la ponctuation choisie
     cleaned_text = re.sub(r'\s+', ' ', cleaned_text).strip()  # Remplace plusieurs espaces par un seul et supprime les espaces aux extrémités
     
     frequencies = {}
     for char in cleaned_text:
         frequencies[char] = frequencies.get(char, 0) + 1
     return frequencies
+
 
 
 # Construction de l'arbre de Huffman
